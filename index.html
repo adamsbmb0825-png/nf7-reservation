@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050505;
+      --panel: #0d0d0d;
+      --line: #343434;
+      --text: #f4f4f4;
+      --muted: #9d9d9d;
+      --danger: #ff3b30;
+      --success: #d8ff00;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        Arial,
+        "Noto Sans TC",
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 10vw, 72px);
+      line-height: .95;
+      letter-spacing: -2px;
+      text-align: center;
+    }
+
+    .event {
+      margin: 18px auto 28px;
+      text-align: center;
+      color: #cfcfcf;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .price {
+      display: inline-block;
+      border: 1px solid #555;
+      padding: 7px 13px;
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 22px;
+      margin-top: 18px;
+    }
+
+    .mode {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .mode button {
+      border: 1px solid #555;
+      background: #111;
+      color: #bbb;
+      min-height: 48px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .mode button.active {
+      background: #f1f1f1;
+      color: #050505;
+      border-color: #f1f1f1;
+    }
+
+    .field {
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: #cfcfcf;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid #454545;
+      background: #070707;
+      color: #fff;
+      min-height: 52px;
+      padding: 0 14px;
+      font-size: 17px;
+      outline: none;
+      border-radius: 0;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #fff;
+    }
+
+    .previous {
+      display: none;
+    }
+
+    .tickets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .tickets button {
+      min-height: 50px;
+      border: 1px solid #444;
+      background: #080808;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .tickets button.selected {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    .note {
+      margin-top: 7px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .submit {
+      width: 100%;
+      min-height: 58px;
+      margin-top: 28px;
+      border: 1px solid #fff;
+      background: #fff;
+      color: #000;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      cursor: pointer;
+    }
+
+    .submit:disabled {
+      cursor: wait;
+      opacity: .45;
+    }
+
+    #error {
+      min-height: 22px;
+      margin-top: 14px;
+      color: #ff6961;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .hidden-trap {
+      position: absolute !important;
+      left: -99999px !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+    }
+
+    #complete {
+      display: none;
+    }
+
+    .complete-title {
+      color: var(--success);
+      font-size: 13px;
+      letter-spacing: 3px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .complete-name {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 18px;
+    }
+
+    .booking-label {
+      text-align: center;
+      margin-top: 26px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #aaa;
+    }
+
+    .booking-code {
+      text-align: center;
+      margin-top: 6px;
+      font-size: clamp(50px, 16vw, 82px);
+      font-weight: 900;
+      letter-spacing: 8px;
+      line-height: 1;
+    }
+
+    .qr-wrap {
+      width: min(330px, 86vw);
+      aspect-ratio: 1;
+      background: #fff;
+      margin: 25px auto 18px;
+      padding: 12px;
+    }
+
+    .qr-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .save {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
+    .mail-status {
+      margin-top: 17px;
+      text-align: center;
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .restart {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 24px;
+      border: 1px solid #555;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+
+    .venue-card {
+      margin-top: 26px;
+      padding-top: 22px;
+      border-top: 1px solid #333;
+      text-align: center;
+    }
+
+    .venue-title {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .venue-address {
+      margin-top: 10px;
+      color: #cfcfcf;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .venue-link {
+      display: block;
+      margin-top: 10px;
+      border: 1px solid #555;
+      padding: 12px 10px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .venue-link:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    @media (max-width: 520px) {
+
+      .page {
+        padding: 20px 12px 40px;
+      }
+
+      .panel {
+        padding: 17px 14px;
+      }
+
+      .tickets button {
+        min-height: 46px;
+      }
+    }
+
+
+    .party-info {
+      margin-top: 42px;
+      padding-top: 32px;
+      border-top: 1px solid #333;
+      text-align: left;
+    }
+
+    .party-kicker {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin-bottom: 26px;
+      color: #d8ff00;
+    }
+
+    .party-block {
+      border-top: 1px solid #282828;
+      padding: 24px 0;
+    }
+
+    .party-block:first-of-type {
+      border-top: 0;
+    }
+
+    .party-block h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.5;
+      letter-spacing: .5px;
+    }
+
+    .party-block p {
+      margin: 0;
+      color: #d1d1d1;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .party-intro p {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.9;
+    }
+
+    .party-event {
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .coming-soon {
+      color: #999 !important;
+      font-style: italic;
+    }
+
+    .party-links-inline,
+    .party-resource-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .party-links-inline a,
+    .party-resource-links a,
+    .party-account {
+      display: inline-block;
+      border: 1px solid #484848;
+      padding: 9px 11px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .7px;
+    }
+
+    .party-links-inline a:hover,
+    .party-resource-links a:hover,
+    .party-account:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .party-account {
+      margin-bottom: 16px;
+    }
+
+    .party-photo-title {
+      margin-top: 20px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 520px) {
+      .party-info {
+        margin-top: 34px;
+        padding-top: 26px;
+      }
+
+      .party-block {
+        padding: 20px 0;
+      }
+
+      .party-block h2 {
+        font-size: 17px;
+      }
+
+      .party-block p {
+        font-size: 13px;
+        line-height: 1.85;
+      }
+
+      .party-intro p {
+        font-size: 15px;
+      }
+
+      .party-links-inline,
+      .party-resource-links {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .party-links-inline a,
+      .party-resource-links a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="eyebrow">
+    SUPERBAD MIDI BREAKS
+  </div>
+
+  <h1>
+    NO FAITH 7
+  </h1>
+
+  <div class="event">
+    28 NOV 2026 / 22:00-05:00<br>
+    23 MUSIC LAB / KAOHSIUNG
+
+    <br>
+
+    <span class="price">
+      ADVANCE RESERVATION - NT$500
+    </span>
+  </div>
+
+
+
+  <div style="
+    margin: 0 auto 18px;
+    max-width: 760px;
+    border: 1px solid #444;
+    padding: 10px 12px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #d8ff00;
+  ">
+    CLOUDFLARE DISPLAY TEST - RESERVATION SUBMISSION NOT CONNECTED
+  </div>
+
+  <!-- =================================================
+       FORM
+       ================================================= -->
+
+  <div
+    id="formPanel"
+    class="panel"
+  >
+
+    <div class="mode">
+
+      <button
+        id="newButton"
+        type="button"
+        class="active"
+        onclick="setMode('NEW')"
+      >
+        NEW RESERVATION
+      </button>
+
+      <button
+        id="modifyButton"
+        type="button"
+        onclick="setMode('MODIFY')"
+      >
+        MODIFY
+      </button>
+
+    </div>
+
+
+    <div
+      id="previousField"
+      class="field previous"
+    >
+
+      <label>
+        PREVIOUS BOOKING CODE
+      </label>
+
+      <input
+        id="previousCode"
+        maxlength="4"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="XXXX"
+      >
+
+      <div class="note">
+        Enter the 4-character code from your previous reservation.
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        NAME / NICKNAME
+      </label>
+
+      <input
+        id="name"
+        maxlength="80"
+        autocomplete="name"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        EMAIL
+      </label>
+
+      <input
+        id="email"
+        type="email"
+        maxlength="180"
+        autocomplete="email"
+      >
+
+      <div class="note">
+        Your BOOKING CODE and QR will also be sent to this address.
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        NUMBER OF TICKETS
+      </label>
+
+      <div class="tickets">
+
+        <button type="button" onclick="selectTickets(1)">1</button>
+        <button type="button" onclick="selectTickets(2)">2</button>
+        <button type="button" onclick="selectTickets(3)">3</button>
+        <button type="button" onclick="selectTickets(4)">4</button>
+        <button type="button" onclick="selectTickets(5)">5</button>
+
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        BACKUP CONTACT
+      </label>
+
+      <input
+        id="contact"
+        maxlength="120"
+        placeholder="Instagram / Facebook / LINE @username"
+      >
+
+      <div class="note">
+        Used only if we need to contact you about your reservation.
+      </div>
+
+    </div>
+
+
+    <!-- Bot honeypot -->
+    <div
+      class="hidden-trap"
+      aria-hidden="true"
+    >
+      <label>
+        Website
+      </label>
+
+      <input
+        id="website"
+        type="text"
+        tabindex="-1"
+        autocomplete="off"
+      >
+    </div>
+
+
+    <button
+      id="submitButton"
+      class="submit"
+      type="button"
+      onclick="submitForm()"
+    >
+      RESERVE
+    </button>
+
+
+    <div id="error"></div>
+
+  </div>
+
+
+  <!-- =================================================
+       COMPLETE
+       ================================================= -->
+
+  <div
+    id="complete"
+    class="panel"
+  >
+
+    <div
+      id="completeTitle"
+      class="complete-title"
+    >
+      RESERVATION COMPLETE
+    </div>
+
+    <div
+      id="completeName"
+      class="complete-name"
+    >
+    </div>
+
+    <div class="booking-label">
+      BOOKING CODE
+    </div>
+
+    <div
+      id="bookingCode"
+      class="booking-code"
+    >
+    </div>
+
+    <div class="qr-wrap">
+
+      <img
+        id="qrImage"
+        alt="BOOKING QR CODE"
+      >
+
+    </div>
+
+    <div class="save">
+      SAVE / SCREENSHOT THIS PAGE<br>
+      Show this QR or BOOKING CODE at the entrance.
+    </div>
+
+    <div
+      id="mailStatus"
+      class="mail-status"
+    >
+    </div>
+
+
+    <div class="venue-card">
+
+      <div class="venue-title">
+        23 MUSIC LAB
+      </div>
+
+      <div class="venue-address">
+        &#39640;&#38596;&#24066;&#40573;&#22485;&#21312;&#22823;&#32681;&#34903;2-2&#34399;<br>
+        &#39361;&#20108;&#34269;&#34899;&#29305;&#21312;&#22823;&#32681;C8-1&#20489;&#24235;
+      </div>
+
+      <a
+        class="venue-link"
+        href="https://www.google.com/maps/search/?api=1&query=%E9%AB%98%E9%9B%84%E5%B8%82%E9%B9%BD%E5%9F%95%E5%8D%80%E5%A4%A7%E7%BE%A9%E8%A1%972-2%E8%99%9F"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        OPEN GOOGLE MAPS
+      </a>
+
+      <a
+        class="venue-link"
+        href="https://www.instagram.com/23_music_lab/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        23 MUSIC LAB - INSTAGRAM
+      </a>
+
+      <a
+        class="venue-link"
+        href="https://www.instagram.com/superbad_midi_breaks/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        SUPERBAD MIDI BREAKS - INSTAGRAM
+      </a>
+
+    </div>
+
+    <button
+      class="restart"
+      type="button"
+      onclick="resetForm()"
+    >
+      MAKE ANOTHER RESERVATION
+    </button>
+
+  </div>
+
+
+  <!-- =================================================
+       PARTY INFORMATION
+       ================================================= -->
+
+  <section class="party-info">
+
+    <div class="party-kicker">PARTY INFORMATION</div>
+
+    <div class="party-block party-intro">
+      <p>&#128293; Superbad MIDI Breaks &#39318;&#24230;&#30331;&#38520;&#39640;&#38596;&#65281;<br>&#36889;&#26159; SBMB &#39318;&#27425;&#22312;&#39640;&#38596;&#33289;&#36774;&#27966;&#23565;&#12290;&#38598;&#32080;&#20358;&#33258;&#21335;&#21488;&#28771;&#30340; DJ&#65292;&#20197;&#21450;&#24478;&#26085;&#26412;&#29305;&#21029;&#20358;&#21488;&#21443;&#25136;&#30340; Special Guests&#65292;NO FAITH &#27491;&#24335;&#36914;&#20837;&#21335;&#21488;&#28771;&#12290;</p>
+    </div>
+
+    <div class="party-block">
+      <p class="party-event">Superbad MIDI Breaks &#20027;&#36774;<br>&#65372;NO FAITH 7&#65372;<br>&#26085;&#26399;&#65306;2026&#24180;11&#26376;28&#26085;&#65288;&#20845;&#65289;22:00-05:00<br>&#22320;&#40670;&#65306;23 Music Lab<br>&#39640;&#38596;&#24066;&#40573;&#22485;&#21312;&#22823;&#32681;&#34903;2-2&#34399; &#39361;&#20108;&#34269;&#34899;&#29305;&#21312;&#22823;&#32681;C8-1&#20489;&#24235;</p>
+
+      <div class="party-links-inline">
+        <a href="https://www.instagram.com/23_music_lab/" target="_blank" rel="noopener noreferrer">@23_music_lab</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=%E9%AB%98%E9%9B%84%E5%B8%82%E9%B9%BD%E5%9F%95%E5%8D%80%E5%A4%A7%E7%BE%A9%E8%A1%972-2%E8%99%9F" target="_blank" rel="noopener noreferrer">GOOGLE MAPS</a>
+      </div>
+    </div>
+
+    <div class="party-block">
+      <h2>■ LINE UP</h2>
+      <p class="coming-soon">coming soon</p>
+    </div>
+
+    <div class="party-block">
+      <h2>&#9632; &#20160;&#40636;&#26159; Superbad MIDI Breaks&#65311;</h2>
+      <a class="party-account" href="https://www.instagram.com/superbad_midi_breaks/" target="_blank" rel="noopener noreferrer">@superbad_midi_breaks</a>
+      <p>Superbad MIDI Breaks&#65288;SBMB&#65289;&#26159;&#20197;&#26481;&#20140;&#65295;&#21488;&#28771;&#28858;&#25818;&#40670;&#30340;&#22320;&#19979;&#30828;&#27966;&#38899;&#27138;&#24288;&#29260;&#65295;&#27966;&#23565;&#22296;&#38538;&#65292;&#20197; Hardcore / Breakcore / Speedcore &#31561;&#38899;&#27138;&#28858;&#26680;&#24515;&#65292;&#33267;&#20170;&#24050;&#25345;&#32396;&#27963;&#21205;&#36229;&#36942; 20 &#24180;&#12290;<br><br>&#33267;&#20170;&#24050;&#30332;&#34892;&#36229;&#36942; 80 &#20491;&#38899;&#27138;&#20316;&#21697;&#65292;&#20006;&#36992;&#35531;&#36229;&#36942; 50 &#20301;&#28023;&#22806;&#34269;&#34899;&#23478;&#36212;&#26085;&#28436;&#20986;&#65292;&#22312;&#26481;&#20140;&#33289;&#36774;&#36229;&#36942; 20 &#22580;&#22320;&#19979;&#27966;&#23565;&#12290;<br><br>&#27492;&#22806;&#65292;&#38263;&#26399;&#36939;&#29151; DJ MIX Podcast&#12300;SBMB HARDCORE RADIO&#12301;&#65292;&#30446;&#21069;&#24050;&#32047;&#31309;&#36229;&#36942; 160 &#38598;&#65292;&#25345;&#32396;&#20171;&#32057;&#20358;&#33258;&#19990;&#30028;&#21508;&#22320;&#30340; DJ &#33287;&#34269;&#34899;&#23478;&#12290;<br><br>&#36879;&#36942;&#38899;&#27138;&#30332;&#34892;&#12289;&#27966;&#23565;&#12289;Podcast &#33287;&#22283;&#38555;&#34269;&#34899;&#23478;&#32178;&#32097;&#65292;SBMB &#38263;&#26399;&#36899;&#32080;&#26085;&#26412;&#12289;&#21488;&#28771;&#20197;&#21450;&#19990;&#30028;&#21508;&#22320;&#30340;&#22320;&#19979;&#38899;&#27138;&#22280;&#12290;<br><br>&#30446;&#21069;&#65292;SBMB &#20063;&#25345;&#32396;&#22312;&#21488;&#28771;&#23450;&#26399;&#33289;&#36774;&#31995;&#21015;&#27966;&#23565;&#12300;NO FAITH&#12301;&#12290;</p>
+
+      <div class="party-resource-links">
+        <a href="https://superbadmidibreaks.bandcamp.com/" target="_blank" rel="noopener noreferrer">BANDCAMP</a>
+        <a href="https://soundcloud.com/superbad-midi-breaks/sets/sbmb-hardcore-radio" target="_blank" rel="noopener noreferrer">SBMB HARDCORE RADIO / SOUNDCLOUD</a>
+      </div>
+    </div>
+
+    <div class="party-block">
+      <h2>&#9632; NO FAITH &#26159;&#20160;&#40636;&#65311;</h2>
+      <p>&#30001; SBMB &#20027;&#36774;&#65292;&#20197; Hardcore / Breakcore / Gabber / Speedcore &#31561;&#38899;&#27138;&#28858;&#26680;&#24515;&#30340;&#21488;&#28771;&#22320;&#19979;&#27966;&#23565;&#31995;&#21015;&#12290;<br><br>NO FAITH &#38598;&#32080;&#21488;&#28771;&#12289;&#26085;&#26412;&#21450;&#28023;&#22806;&#30340; DJ&#65295;&#34269;&#34899;&#23478;&#65292;&#25345;&#32396;&#36899;&#32080;&#19981;&#21516;&#22320;&#21312;&#30340;&#22320;&#19979;&#38899;&#27138;&#22280;&#12290;<br><br>NO FAITH 7 &#39318;&#24230;&#31227;&#24107;&#39640;&#38596;&#65292;&#38598;&#32080;&#20358;&#33258;&#39640;&#38596;&#12289;&#21488;&#21335;&#12289;&#21488;&#21271;&#33287;&#26085;&#26412;&#30340;&#34269;&#34899;&#23478;&#65292;&#23559;&#27963;&#21205;&#29256;&#22294;&#27491;&#24335;&#24310;&#20280;&#33267;&#21335;&#21488;&#28771;&#12290;</p>
+      <div class="party-photo-title">&#9654;&#65038; &#19978;&#19968;&#22580;&#27966;&#23565;&#29031;&#29255; [ NO FAITH Party Photos ]</div>
+
+      <div class="party-resource-links">
+        <a href="https://www.facebook.com/share/p/1D84DWnHzq/" target="_blank" rel="noopener noreferrer">FACEBOOK PHOTOS</a>
+        <a href="https://www.instagram.com/p/DZpQjn_Esi7/" target="_blank" rel="noopener noreferrer">INSTAGRAM PHOTOS</a>
+      </div>
+    </div>
+
+    <div class="party-block">
+      <h2>&#9632; &#20837;&#22580;&#29305;&#20856;</h2>
+      <p>NO FAITH 7 &#23560;&#23660; Wristband<br>&#8251; &#20316;&#28858;&#30070;&#26085;&#20837;&#22580;&#35672;&#21029;&#33287;&#32000;&#24565;&#65292;&#35531;&#22949;&#21892;&#20445;&#31649;&#65292;&#19981;&#21487;&#36681;&#35731;&#12290;</p>
+    </div>
+
+  </section>
+
+</div>
+
+
+<script>
+
+  let currentMode = 'NEW';
+  let selectedTickets = 0;
+  let submitting = false;
+
+
+  function normalizeCode(value) {
+
+    return String(value || '')
+      .normalize('NFKC')
+      .replace(/\s+/g, '')
+      .toUpperCase();
+  }
+
+
+  function setMode(mode) {
+
+    currentMode = mode;
+
+    const isModify =
+      mode === 'MODIFY';
+
+    document
+      .getElementById('newButton')
+      .classList
+      .toggle('active', !isModify);
+
+    document
+      .getElementById('modifyButton')
+      .classList
+      .toggle('active', isModify);
+
+    document
+      .getElementById('previousField')
+      .style.display =
+        isModify
+          ? 'block'
+          : 'none';
+
+    document
+      .getElementById('submitButton')
+      .textContent =
+        isModify
+          ? 'UPDATE RESERVATION'
+          : 'RESERVE';
+
+    clearError();
+  }
+
+
+  function selectTickets(number) {
+
+    selectedTickets = number;
+
+    const buttons =
+      document.querySelectorAll(
+        '.tickets button'
+      );
+
+    buttons.forEach(
+      function(button, index) {
+
+        button
+          .classList
+          .toggle(
+            'selected',
+            index + 1 === number
+          );
+      }
+    );
+  }
+
+
+  function submitForm() {
+
+    if (submitting) {
+      return;
+    }
+
+    clearError();
+
+
+    const previousCode =
+      normalizeCode(
+        document
+          .getElementById('previousCode')
+          .value
+      );
+
+    const name =
+      document
+        .getElementById('name')
+        .value
+        .trim();
+
+    const email =
+      document
+        .getElementById('email')
+        .value
+        .trim();
+
+    const contact =
+      document
+        .getElementById('contact')
+        .value
+        .trim();
+
+    const website =
+      document
+        .getElementById('website')
+        .value
+        .trim();
+
+
+    if (
+      currentMode === 'MODIFY' &&
+      previousCode.length !== 4
+    ) {
+
+      showError(
+        'Please enter your 4-character BOOKING CODE.'
+      );
+
+      return;
+    }
+
+
+    if (!name) {
+
+      showError(
+        'Please enter your name.'
+      );
+
+      return;
+    }
+
+
+    if (
+      !email ||
+      !email.includes('@')
+    ) {
+
+      showError(
+        'Please enter a valid email address.'
+      );
+
+      return;
+    }
+
+
+    if (
+      selectedTickets < 1 ||
+      selectedTickets > 5
+    ) {
+
+      showError(
+        'Please select the number of tickets.'
+      );
+
+      return;
+    }
+
+
+    if (!contact) {
+
+      showError(
+        'Please enter a backup contact.'
+      );
+
+      return;
+    }
+
+
+    submitting = true;
+
+    const submitButton =
+      document.getElementById(
+        'submitButton'
+      );
+
+    submitButton.disabled = true;
+
+    submitButton.textContent =
+      'PROCESSING...';
+
+
+    const payload = {
+
+      type:
+        currentMode,
+
+      previousCode:
+        previousCode,
+
+      name:
+        name,
+
+      email:
+        email,
+
+      tickets:
+        selectedTickets,
+
+      contact:
+        contact,
+
+      website:
+        website
+    };
+
+
+    window.__disabledGoogleScriptRun
+
+      .withSuccessHandler(
+        function(result) {
+
+          submitting = false;
+
+          showComplete(result);
+        }
+      )
+
+      .withFailureHandler(
+        function(error) {
+
+          submitting = false;
+
+          submitButton.disabled = false;
+
+          submitButton.textContent =
+            currentMode === 'MODIFY'
+              ? 'UPDATE RESERVATION'
+              : 'RESERVE';
+
+          showError(
+            error.message ||
+            'Something went wrong.'
+          );
+        }
+      )
+
+      .submitReservation(
+        payload
+      );
+  }
+
+
+  function showComplete(result) {
+
+    document
+      .getElementById('formPanel')
+      .style.display =
+        'none';
+
+    document
+      .getElementById('complete')
+      .style.display =
+        'block';
+
+    document
+      .getElementById('completeTitle')
+      .textContent =
+        result.mode === 'MODIFY'
+          ? 'RESERVATION UPDATED'
+          : 'RESERVATION COMPLETE';
+
+    document
+      .getElementById('completeName')
+      .textContent =
+        result.name +
+        ' / ' +
+        result.tickets +
+        ' ticket' +
+        (
+          result.tickets > 1
+            ? 's'
+            : ''
+        );
+
+    document
+      .getElementById('bookingCode')
+      .textContent =
+        result.code;
+
+    document
+      .getElementById('qrImage')
+      .src =
+        result.qrUrl;
+
+
+    let mailText =
+      'A confirmation email was also sent.';
+
+    if (
+      result.mailStatus === 'SEND_ERROR' ||
+      result.mailStatus === 'MODIFY_SEND_ERROR'
+    ) {
+
+      mailText =
+        'Email delivery could not be confirmed. Please save this screen.';
+    }
+
+    document
+      .getElementById('mailStatus')
+      .textContent =
+        mailText;
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+
+  function resetForm() {
+
+    currentMode = 'NEW';
+    selectedTickets = 0;
+    submitting = false;
+
+    document
+      .getElementById('previousCode')
+      .value = '';
+
+    document
+      .getElementById('name')
+      .value = '';
+
+    document
+      .getElementById('email')
+      .value = '';
+
+    document
+      .getElementById('contact')
+      .value = '';
+
+    document
+      .getElementById('website')
+      .value = '';
+
+    document
+      .querySelectorAll('.tickets button')
+      .forEach(
+        function(button) {
+          button.classList.remove('selected');
+        }
+      );
+
+    document
+      .getElementById('complete')
+      .style.display =
+        'none';
+
+    document
+      .getElementById('formPanel')
+      .style.display =
+        'block';
+
+    document
+      .getElementById('submitButton')
+      .disabled =
+        false;
+
+    setMode('NEW');
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+
+  function showError(message) {
+
+    document
+      .getElementById('error')
+      .textContent =
+        message;
+  }
+
+
+  function clearError() {
+
+    document
+      .getElementById('error')
+      .textContent =
+        '';
+  }
+
+
+  document
+    .getElementById('previousCode')
+    .addEventListener(
+      'input',
+      function() {
+
+        this.value =
+          normalizeCode(
+            this.value
+          ).slice(0, 4);
+      }
+    );
+
+
+  // =========================================================
+  // CLOUDFLARE DISPLAY TEST MODE
+  // Real reservation submission is intentionally disabled.
+  // =========================================================
+
+  submitReservation = function() {
+    const notice = document.getElementById('statusMessage');
+    if (notice) {
+      notice.textContent = 'DISPLAY TEST ONLY - Reservation submission is not connected yet.';
+      notice.style.color = '#d8ff00';
+    }
+
+    const submitBtn = document.getElementById('submitButton');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+    }
+
+    return false;
+  };
+
+</script>
+
+</body>
+</html>
